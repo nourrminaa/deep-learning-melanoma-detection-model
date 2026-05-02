@@ -1,7 +1,7 @@
 import { Client } from "@gradio/client";
 
 const SPACE_ID = "srnazr/melanoma-detector";
-const THRESHOLD = 0.25;
+const THRESHOLD = 0.5;
 
 export async function analyzeImage(file) {
   const client = await Client.connect(SPACE_ID);
