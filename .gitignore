@@ -63,3 +63,4 @@ ENV/
 *.rar
 coverage/
 .cache/
+.vite/
