@@ -9,19 +9,19 @@ export async function analyzeImage(file) {
 
   const data = result.data[0];
 
-  // Single sigmoid — label is whichever scored highest
   const melanoma = data.confidences.find(c => c.label === "Melanoma");
   const benign   = data.confidences.find(c => c.label === "Benign");
 
   const melanomProb = melanoma.confidence;
+  const benignProb  = benign.confidence;
   const isMelanoma  = melanomProb >= THRESHOLD;
 
   return {
-    prediction:  isMelanoma ? "Melanoma" : "Benign",
-    confidence:  isMelanoma ? melanomProb : benign.confidence,
+    prediction: isMelanoma ? "Malignant" : "Benign", 
+    confidence: isMelanoma ? melanomProb : benignProb,
     probabilities: {
-      melanoma: melanomProb,
-      benign:   benign.confidence,
+      malignant: melanomProb, 
+      benign:    benignProb,
     },
   };
 }
