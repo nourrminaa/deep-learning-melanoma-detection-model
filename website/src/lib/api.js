@@ -1,58 +1,27 @@
-// =============================================================================
-// API LAYER
-// -----------------------------------------------------------------------------
-// Right now this is a MOCK that returns fake results so you can test the UI
-// without a backend. When your Hugging Face Space (or Colab Gradio link) is
-// ready, replace the body of `analyzeImage` with the real call — see the
-// commented block at the bottom of this file for the template.
-// =============================================================================
+import { Client } from "@gradio/client";
+
+const SPACE_ID = "srnazr/melanoma-detector";
+const THRESHOLD = 0.25;
 
 export async function analyzeImage(file) {
-  // --- MOCK IMPLEMENTATION (remove once the model is hooked up) ---
-  await new Promise((resolve) => setTimeout(resolve, 2200));
+  const client = await Client.connect(SPACE_ID);
+  const result = await client.predict("/predict", { image: file });
 
-  const malignantProb = Math.random();
-  const benignProb = 1 - malignantProb;
-  const isMalignant = malignantProb > 0.5;
+  const data = result.data[0];
+
+  // Single sigmoid — label is whichever scored highest
+  const melanoma = data.confidences.find(c => c.label === "Melanoma");
+  const benign   = data.confidences.find(c => c.label === "Benign");
+
+  const melanomProb = melanoma.confidence;
+  const isMelanoma  = melanomProb >= THRESHOLD;
 
   return {
-    prediction: isMalignant ? "Malignant" : "Benign",
-    confidence: isMalignant ? malignantProb : benignProb,
+    prediction:  isMelanoma ? "Melanoma" : "Benign",
+    confidence:  isMelanoma ? melanomProb : benign.confidence,
     probabilities: {
-      benign: benignProb,
-      malignant: malignantProb,
+      melanoma: melanomProb,
+      benign:   benign.confidence,
     },
   };
 }
-
-// =============================================================================
-// REAL IMPLEMENTATION TEMPLATE — uncomment and adapt when ready
-// =============================================================================
-//
-// import { Client } from "@gradio/client";
-//
-// // Replace with your Hugging Face Space slug, e.g. "yourname/melanoma-detector"
-// const SPACE_ID = "YOUR_USERNAME/YOUR_SPACE_NAME";
-//
-// export async function analyzeImage(file) {
-//   const client = await Client.connect(SPACE_ID);
-//   const result = await client.predict("/predict", { image: file });
-//
-//   // result.data is whatever your Gradio function returned.
-//   // The shape below assumes your Gradio app returns:
-//   //   { label: "Malignant", confidences: [{label, confidence}, ...] }
-//   // Adjust this parser to match what your model actually returns.
-//
-//   const data = Array.isArray(result.data) ? result.data[0] : result.data;
-//   const benign = data.confidences.find((c) => c.label.toLowerCase() === "benign");
-//   const malignant = data.confidences.find((c) => c.label.toLowerCase() === "malignant");
-//
-//   return {
-//     prediction: data.label,
-//     confidence: data.label === "Malignant" ? malignant.confidence : benign.confidence,
-//     probabilities: {
-//       benign: benign.confidence,
-//       malignant: malignant.confidence,
-//     },
-//   };
-// }
