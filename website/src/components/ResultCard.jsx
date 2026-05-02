@@ -38,7 +38,7 @@ export default function ResultCard({ result, onReset }) {
           className={`inline-flex items-center text-xs uppercase tracking-[0.15em] font-medium px-3 py-1 rounded-full border ${
             isMalignant
               ? "bg-rose-50 text-rose-700 border-rose-200"
-              : "bg-emerald-50 text-emerald-700 border-emerald-200"
+              : "bg-sky-50 text-sky-700 border-sky-200"
           }`}
         >
           {result.prediction}
